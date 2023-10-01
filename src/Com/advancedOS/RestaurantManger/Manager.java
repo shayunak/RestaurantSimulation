@@ -12,7 +12,6 @@ public class Manager {
     private Integer numberOfDiners;
     private Integer numberOfCooks;
     private Integer numberOfTables;
-    private ArrayList<Table> tables;
     private ArrayList<order> orders;
 
     public Manager(InputScanner in) {
@@ -25,6 +24,17 @@ public class Manager {
     public void startSimulation() {
         System.out.format("In Restaurant 6431, there are %d tables, %d cooks, " +
                 "and %d dinner will be coming.", numberOfTables, numberOfCooks, numberOfDiners);
+        initializeResources();
 
+    }
+
+    private void initializeResources() {
+        initializeTables();
+    }
+
+    private void initializeTables() {
+        Table.availableTables = new ArrayList<>();
+        for (int i = 0; i < numberOfTables; i++)
+            Table.availableTables.add(new Table(i));
     }
 }
