@@ -39,6 +39,7 @@ public class DinerThread extends Thread {
                 e.printStackTrace();
             }
         }
+        Manager.getCurrentTime(this);
     }
 
     private void eat() {

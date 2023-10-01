@@ -1,5 +1,6 @@
 package Com.advancedOS.RestaurantManger;
 
+import Com.advancedOS.RestaurantManger.Resources.MachineController;
 import Com.advancedOS.RestaurantManger.Resources.Table;
 
 import java.util.ArrayList;
@@ -93,6 +94,7 @@ public class Manager {
 
     private void initializeResources() {
         initializeTables();
+        MachineController.initializedMachineController();
     }
 
     private void initializeTables() {

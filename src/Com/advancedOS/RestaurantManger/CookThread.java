@@ -9,7 +9,7 @@ public class CookThread extends Thread {
     private static final Lock capacityLock = new ReentrantLock();
     private static final Condition notEmptyDiners = capacityLock.newCondition();
     private static final Condition notFullCooks = capacityLock.newCondition();
-    private static final ArrayList<Order> orders = new ArrayList<Order>();
+    private static final ArrayList<Order> orders = new ArrayList<>();
     private Order orderServing;
     private final Integer myId;
     private Boolean exit;
