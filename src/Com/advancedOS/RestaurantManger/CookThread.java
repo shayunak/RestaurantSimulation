@@ -25,6 +25,10 @@ public class CookThread extends Thread {
         exit = true;
     }
 
+    public Integer getMyId() {
+        return myId;
+    }
+
     public void setOrderServing(Order orderServing) {
         this.orderServing = orderServing;
     }
@@ -64,12 +68,20 @@ public class CookThread extends Thread {
         capacityLock.unlock();
     }
 
+    private void acquireMachine(){
+
+    }
+
     private void serveOrder() {
 
         // Done serving, next order to be served
-        orderServing.isReady().notify();
+        orderServing.isReady.notify();
         CookThread.numberOfAvailableCooks++;
         notFullCooks.signal();
+    }
+
+    public Integer getMyTime() {
+        return myTime;
     }
 
     @Override
@@ -78,7 +90,7 @@ public class CookThread extends Thread {
             consumeOrder(this);
             Manager.getCurrentTime(this);
             Event.logEvent(myTime, String.format("Diner %d's order will be processed by Cook %d",
-                    orderServing.dinerId(), myId));
+                    orderServing.dinerId, myId));
             if(exit)
                 break;
             serveOrder();

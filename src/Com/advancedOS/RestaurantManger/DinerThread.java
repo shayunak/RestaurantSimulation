@@ -2,8 +2,6 @@ package Com.advancedOS.RestaurantManger;
 
 import Com.advancedOS.RestaurantManger.Resources.Table;
 
-record Order(Object isReady, Integer dinerId, Integer numberOfBurgersRemaining, Integer numberOfFriesRemaining, Boolean isCokePrepared) {}
-
 public class DinerThread extends Thread {
     private final Integer myId;
     private final Order myOrder;
@@ -32,9 +30,9 @@ public class DinerThread extends Thread {
 
     private void waitForYourOrder() {
         CookThread.produceOrder(myOrder);
-        synchronized (myOrder.isReady()) {
+        synchronized (myOrder.isReady) {
             try {
-                myOrder.isReady().wait();
+                myOrder.isReady.wait();
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
