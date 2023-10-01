@@ -17,5 +17,38 @@ public class DinerThread extends Thread {
         this.timeArrived = timeArrived;
     }
 
+    private void waitForYourArrival() {
+        Manager.getCurrentTime(this);
+        while (myTime < timeArrived) {Manager.getCurrentTime(this);}
+        Event.logEvent(myTime, String.format("Diner %d arrives", myId));
+    }
 
+    private void seat() {
+
+    }
+
+    private void waitForYourOrder() {
+
+    }
+
+    private void eat() {
+
+    }
+
+    private void getOut() {
+
+    }
+
+    @Override
+    public void run() {
+        waitForYourArrival();
+        seat();
+        waitForYourOrder();
+        eat();
+        getOut();
+    }
+
+    public void setTime(Integer globalTime) {
+        this.myTime = globalTime;
+    }
 }
