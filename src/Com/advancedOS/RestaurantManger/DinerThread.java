@@ -2,14 +2,15 @@ package Com.advancedOS.RestaurantManger;
 
 import Com.advancedOS.RestaurantManger.Resources.Table;
 
-record Order(Integer numberOfBurgersRemaining, Integer numberOfFriesRemaining, Boolean isCokePrepared) {}
+record Order(Object isReady, Integer dinerId, Integer numberOfBurgersRemaining, Integer numberOfFriesRemaining, Boolean isCokePrepared) {}
 
 public class DinerThread extends Thread {
-    private Integer myId;
-    private Order myOrder;
+    private final Integer myId;
+    private final Order myOrder;
     private Table myTable;
-    private Integer timeArrived;
+    private final Integer timeArrived;
     private Integer myTime;
+    private static final Integer TIME_TO_EAT = 30;
 
     public DinerThread(Integer id, Order order, Integer timeArrived) {
         this.myId = id;
@@ -24,19 +25,31 @@ public class DinerThread extends Thread {
     }
 
     private void seat() {
-
+        myTable = Table.acquireTable();
+        Manager.getCurrentTime(this);
+        Event.logEvent(myTime, String.format("Diner %d is seated at table %d", myId, myTable.getId()));
     }
 
     private void waitForYourOrder() {
-
+        CookThread.produceOrder(myOrder);
+        synchronized (myOrder.isReady()) {
+            try {
+                myOrder.isReady().wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void eat() {
-
+        Event.logEvent(myTime, String.format("Diner %d's food is ready. Diner %d starts to eat.", myId, myId));
+        Integer beginningToEatTime = myTime;
+        while ((myTime - beginningToEatTime) < TIME_TO_EAT) {Manager.getCurrentTime(this);}
     }
 
     private void getOut() {
-
+        Table.releaseTable(myTable);
+        Event.logEvent(myTime, String.format("Diner %d leaves", myId));
     }
 
     @Override

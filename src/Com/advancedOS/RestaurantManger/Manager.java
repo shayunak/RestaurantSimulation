@@ -30,6 +30,13 @@ public class Manager {
         timeLock.unlock();
     }
 
+    public static void getCurrentTime (CookThread cook) {
+        timeLock.lock();
+        cook.setTime(globalTime);
+        timeLock.unlock();
+    }
+
+
     private static void updateTime () {
         timeLock.lock();
         globalTime++;
@@ -47,12 +54,14 @@ public class Manager {
     private void initializeDiners() {
         diners = new ArrayList<>();
         for (int i = 0; i < numberOfDiners; i++){
-            Order dinerOrder = new Order(orders.get(i).numberOfBurgers(), orders.get(i).numberOfFries(), !orders.get(i).isCokeOrdered());
+            Order dinerOrder = new Order(new Object(), i, orders.get(i).numberOfBurgers(),
+                    orders.get(i).numberOfFries(), !orders.get(i).isCokeOrdered());
             diners.add(new DinerThread(i, dinerOrder, orders.get(i).timeArrived()));
         }
     }
 
     private void initializeCooks() {
+        CookThread.numberOfAvailableCooks = numberOfCooks;
         cooks = new ArrayList<>();
         for (int i = 0; i < numberOfCooks; i++)
             cooks.add(new CookThread(i));
@@ -78,7 +87,8 @@ public class Manager {
             diners.removeIf(diner -> !diner.isAlive());
         }
         Event.logEvent(globalTime, "The last diner has left and the restaurant is to be closed");
-        Event.logToConsole();
+        Event.logToConsole(); // Log to console all the events in order
+        cooks.forEach(Thread::interrupt); // Kill cook threads
     }
 
     private void initializeResources() {
