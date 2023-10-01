@@ -55,7 +55,7 @@ public class Manager {
     private void initializeDiners() {
         diners = new ArrayList<>();
         for (int i = 0; i < numberOfDiners; i++){
-            Order dinerOrder = new Order(new Object(), i, orders.get(i).numberOfBurgers(),
+            Order dinerOrder = new Order(i, orders.get(i).numberOfBurgers(),
                     orders.get(i).numberOfFries(), !orders.get(i).isCokeOrdered());
             diners.add(new DinerThread(i, dinerOrder, orders.get(i).timeArrived()));
         }
