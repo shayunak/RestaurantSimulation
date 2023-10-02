@@ -29,7 +29,6 @@ public class Event {
     }
 
     public static void logToConsole() {
-        //eventList.sort(Comparator.comparing(Event::getTime));
         eventList.forEach(event -> System.out.format("[%d] %s.\n", event.getTime(), event.getMessage()));
     }
 }
