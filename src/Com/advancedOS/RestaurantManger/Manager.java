@@ -12,7 +12,7 @@ public class Manager {
     private ArrayList<DinerThread> diners;
     private static final Lock timeLock = new ReentrantLock();
     private static Integer globalTime = 0;
-    private final Integer STEP_TIME = 10;
+    private final Integer STEP_TIME = 100;
     private final Integer numberOfDiners;
     private final Integer numberOfCooks;
     private final Integer numberOfTables;
@@ -82,6 +82,7 @@ public class Manager {
         runThreads();
         while (diners.size() > 0) {
             sleepTime();
+            diners.removeIf(diner -> !diner.isAlive());
             if (diners.size() == 0)
                 break;
             updateTime();

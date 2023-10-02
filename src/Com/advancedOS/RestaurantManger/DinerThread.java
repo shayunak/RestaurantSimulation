@@ -41,7 +41,7 @@ public class DinerThread extends Thread {
     }
 
     private void eat() {
-        Event.logEvent(myTime, String.format("Diner %d's food is ready. Diner %d starts to eat.", myId, myId));
+        Event.logEvent(myTime, String.format("Diner %d's food is ready. Diner %d starts to eat", myId, myId));
         Integer beginningToEatTime = myTime;
         while ((myTime - beginningToEatTime) < TIME_TO_EAT) {Manager.getCurrentTime(this);}
     }
