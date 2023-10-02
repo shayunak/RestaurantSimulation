@@ -164,11 +164,11 @@ public class CookThread extends Thread {
     public void run() {
        while (!exit) {
             consumeOrder(this);
+           if(exit)
+               break;
             Manager.getCurrentTime(this);
             Event.logEvent(myTime, String.format("Diner %d's order will be processed by Cook %d",
                     orderServing.dinerId, myId));
-            if(exit)
-                break;
             serveOrder();
        }
     }

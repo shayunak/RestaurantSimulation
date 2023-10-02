@@ -70,6 +70,8 @@ public class MachineController {
     public void releaseFrierMachine(){
         machineLock.lock();
         isFrierMachineBusy = false;
+        machineCondition.signal();
+        machineLock.unlock();
     }
 
     public void releaseCokeMachine(){
