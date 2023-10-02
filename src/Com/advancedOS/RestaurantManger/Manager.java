@@ -75,7 +75,7 @@ public class Manager {
 
     public void startSimulation() {
         System.out.format("In Restaurant 6431, there are %d tables, %d cooks, " +
-                "and %d dinner will be coming.", numberOfTables, numberOfCooks, numberOfDiners);
+                "and %d dinner will be coming.\n", numberOfTables, numberOfCooks, numberOfDiners);
         initializeResources();
         initializeDiners();
         initializeCooks();

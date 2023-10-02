@@ -61,15 +61,22 @@ public class MachineController {
     }
 
     public void releaseBurgerMachine(){
+        machineLock.lock();
         isBurgerMachineBusy = false;
+        machineCondition.signal();
+        machineLock.unlock();
     }
 
     public void releaseFrierMachine(){
+        machineLock.lock();
         isFrierMachineBusy = false;
     }
 
     public void releaseCokeMachine(){
+        machineLock.lock();
         isCokeMachineBusy = false;
+        machineCondition.signal();
+        machineLock.unlock();
     }
 
     public void cookBurger(CookThread cook){

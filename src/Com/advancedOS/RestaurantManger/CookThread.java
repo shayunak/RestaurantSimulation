@@ -1,15 +1,25 @@
 package Com.advancedOS.RestaurantManger;
 
+import Com.advancedOS.RestaurantManger.Resources.MachineController;
+
 import java.util.ArrayList;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+
+enum MachineType {
+    BURGER,
+    FRY,
+    COKE,
+    NONE
+}
 
 public class CookThread extends Thread {
     private static final Lock capacityLock = new ReentrantLock();
     private static final Condition notEmptyDiners = capacityLock.newCondition();
     private static final Condition notFullCooks = capacityLock.newCondition();
     private static final ArrayList<Order> orders = new ArrayList<>();
+    private MachineController controller;
     private Order orderServing;
     private final Integer myId;
     private Boolean exit;
@@ -68,16 +78,82 @@ public class CookThread extends Thread {
         capacityLock.unlock();
     }
 
-    private void acquireMachine(){
+    private MachineType checkMachineAvailability() {
+        if (orderServing.numberOfBurgersRemaining > 0 && !controller.getBurgerMachineBusy())
+            return MachineType.BURGER;
+        else if (orderServing.numberOfFriesRemaining > 0 && !controller.getFrierMachineBusy())
+            return MachineType.FRY;
+        else if (!orderServing.isCokePrepared && !controller.getCokeMachineBusy())
+            return MachineType.COKE;
+        else
+            return MachineType.NONE;
+    }
 
+    private void getAvailableMachine(MachineType machineType) {
+        if (machineType == MachineType.BURGER)
+            controller.acquireBurgerMachine();
+        else if (machineType == MachineType.FRY)
+            controller.acquireFrierMachine();
+        else if (machineType == MachineType.COKE)
+            controller.acquireCokeMachine();
+    }
+
+    private MachineType acquireMachine(){
+        controller.machineLock.lock();
+        MachineType machineType = checkMachineAvailability();
+        while(machineType == MachineType.NONE) {
+            try {
+                controller.machineCondition.await();
+            } catch (InterruptedException e) {
+                controller.machineLock.unlock();
+                e.printStackTrace();
+                return MachineType.NONE;
+            }
+            machineType = checkMachineAvailability();
+        }
+        getAvailableMachine(machineType);
+        controller.machineLock.unlock();
+        return machineType;
+    }
+
+    private void wakeupDiner() {
+        synchronized (orderServing.isReady) {
+            orderServing.isReady.notifyAll();
+        }
+    }
+
+    private void notifyOrderProducers() {
+        capacityLock.lock();
+        CookThread.numberOfAvailableCooks++;
+        notFullCooks.signal();
+        capacityLock.unlock();
+    }
+
+    private void doneServing(){
+        wakeupDiner();
+        notifyOrderProducers();
     }
 
     private void serveOrder() {
-
+        controller = MachineController.getInstance();
+        while (orderServing.numberOfBurgersRemaining > 0 || orderServing.numberOfFriesRemaining > 0 || !orderServing.isCokePrepared) {
+            MachineType machineTypeAcquired = acquireMachine();
+            if (machineTypeAcquired == MachineType.BURGER) {
+                controller.cookBurger(this);
+                orderServing.numberOfBurgersRemaining--;
+                controller.releaseBurgerMachine();
+            } else if (machineTypeAcquired == MachineType.FRY) {
+                controller.fry(this);
+                orderServing.numberOfFriesRemaining--;
+                controller.releaseFrierMachine();
+            } else if (machineTypeAcquired == MachineType.COKE) {
+                controller.getCoke(this);
+                orderServing.isCokePrepared = true;
+                controller.releaseCokeMachine();
+            }
+        }
         // Done serving, next order to be served
-        orderServing.isReady.notify();
-        CookThread.numberOfAvailableCooks++;
-        notFullCooks.signal();
+        doneServing();
     }
 
     public Integer getMyTime() {
